@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="data:,">
+<meta name="format-detection" content="telephone=no">
+<title>Physikarbeit</title>
+<style>
+:root{
+  --afb1:#2E7D5B; --afb2:#D9822B; --afb3:#B23A48;
+  --grau:#ECECEC; --dunkel:#222; --blau:#1F4E8C; --blau-hell:#D9E4F5; --rand:#9A9A9A;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#fff;color:var(--dunkel);font:17px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;padding-bottom:calc(90px + env(safe-area-inset-bottom))}
+#kopf{max-width:860px;margin:0 auto;padding:14px 18px 8px;border-bottom:2px solid var(--dunkel);display:flex;justify-content:space-between;font-weight:600;font-size:15px}
+#kopf span:nth-child(2){text-align:center}
+#kopf span:last-child{font-weight:400}
+main{max-width:860px;margin:0 auto;padding:12px 18px}
+h1{font-size:25px;line-height:1.25;margin:14px 0 6px}
+p{margin:6px 0}
+.klein{font-size:14px;color:#555}
+.box{border:1.5px solid var(--rand);border-radius:14px;padding:14px 16px;background:#F7F7F7;margin:12px 0}
+.box.warn{background:#FFF3D6;border-color:var(--afb2)}
+.box.ok{background:#E3F2EA;border-color:var(--afb1)}
+.box.fehler{background:#F7E3E6;border-color:var(--afb3)}
+input[type=text]{font:inherit;font-size:24px;letter-spacing:.12em;text-transform:uppercase;text-align:center;width:100%;padding:12px;border:2px solid var(--rand);border-radius:12px;background:#fff;
+  -webkit-user-select:text;user-select:text;font-family:ui-monospace,Menlo,monospace}
+button{font:inherit;cursor:pointer}
+.btn{display:block;width:100%;min-height:52px;border:0;border-radius:12px;background:var(--blau);color:#fff;font-weight:700;font-size:18px;padding:12px 16px;margin-top:12px}
+.btn.zweit{background:#fff;color:var(--blau);border:2px solid var(--blau)}
+.btn:disabled{opacity:.45}
+.btn.klein{display:inline-block;width:auto;min-height:40px;font-size:15px;padding:8px 14px;margin:6px 8px 0 0}
+/* Leiste oben */
+#leiste{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--rand)}
+#leiste .in{max-width:860px;margin:0 auto;padding:8px 18px;display:flex;gap:14px;align-items:center;justify-content:space-between;font-size:15px}
+#zeit{font-weight:800;font-size:20px;font-variant-numeric:tabular-nums}
+#zeit.knapp{color:var(--afb2)} #zeit.sehr{color:var(--afb3)}
+.punkt{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--afb1);margin-right:6px;vertical-align:middle}
+.punkt.off{background:var(--afb3)}
+/* Aufgabenkarten */
+.card{border:1.6px solid var(--c);border-radius:14px;overflow:hidden;margin:16px 0;background:#fff}
+.card.afb1{--c:var(--afb1)} .card.afb2{--c:var(--afb2)} .card.afb3{--c:var(--afb3)}
+.bar{background:var(--c);color:#fff;font-weight:700;font-size:15px;padding:9px 14px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.bar .re{font-weight:400}
+.body{padding:12px 14px 14px}
+.frage{margin:2px 0 10px}
+.bild{display:block;max-width:100%;margin:6px auto 12px;border:1px solid #ddd;border-radius:8px;background:#fff;-webkit-user-drag:none}
+.opt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:2px solid transparent;background:var(--grau);border-radius:12px;padding:10px 12px;margin:8px 0;min-height:48px;color:var(--dunkel);-webkit-tap-highlight-color:transparent}
+.opt .bu{flex:0 0 32px;height:32px;border-radius:50%;background:#fff;border:1.5px solid var(--rand);display:flex;align-items:center;justify-content:center;font-weight:700}
+.opt.sel{background:var(--blau-hell);border-color:var(--blau)}
+.opt.sel .bu{background:var(--blau);border-color:var(--blau);color:#fff}
+.opt:disabled{opacity:.6}
+.wahlkopf{border:1.6px solid var(--afb3);border-radius:14px;background:#F7E3E6;padding:12px 14px;margin:22px 0 4px}
+.card.aus{opacity:.55}
+.fertig{font-size:34px;font-family:ui-monospace,Menlo,monospace;font-weight:800;letter-spacing:.1em;text-align:center;margin:10px 0}
+/* Abgabeleiste */
+#fuss{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1.5px solid var(--rand);padding:10px 18px calc(10px + env(safe-area-inset-bottom));z-index:20}
+#fuss .in{max-width:860px;margin:0 auto;display:flex;gap:14px;align-items:center;justify-content:space-between}
+#fuss .btn{margin:0;width:auto;min-width:190px}
+/* Dialog */
+#modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:50;padding:18px}
+#modal.an{display:flex}
+#modal .dlg{background:#fff;border-radius:16px;padding:20px;max-width:480px;width:100%}
+#modal h2{margin:0 0 8px;font-size:21px}
+.zeile{display:flex;gap:10px}.zeile .btn{margin-top:14px}
+@media (max-width:560px){#kopf{font-size:13px;padding:10px 12px 6px} main{padding:10px 12px} #leiste .in{padding:6px 12px}}
+</style>
+</head>
+<body>
+<div id="kopf"><span>Gymnasium Walsrode</span><span id="kopf-fach"></span><span id="kopf-ort"></span></div>
+<div id="leiste" hidden><div class="in">
+  <span><span id="status" class="punkt"></span><span id="codeanzeige"></span></span>
+  <span id="verlassen" class="klein"></span>
+  <span>Restzeit <span id="zeit">--:--</span></span>
+</div></div>
+<main id="app"></main>
+<div id="fuss" hidden><div class="in"><span id="fortschritt"></span><button class="btn" id="abgabe">Speichern und abgeben</button></div></div>
+<div id="modal"><div class="dlg" id="dlg"></div></div>
+
+<script src="config.js"></script>
+<script>
+(function(){
+'use strict';
+var CFG = window.ARBEIT_CONFIG || {};
+var LS = 'arbeit_zustand_v1';
+
+/* ---------- Hilfsfunktionen ---------- */
+function $(s, r){ return (r||document).querySelector(s); }
+function h(tag, attrs){
+  var e = document.createElement(tag), i, k;
+  attrs = attrs || {};
+  for (k in attrs){
+    if (k === 'class') e.className = attrs[k];
+    else if (k === 'text') e.textContent = attrs[k];
+    else if (k.slice(0,2) === 'on') e.addEventListener(k.slice(2), attrs[k]);
+    else e.setAttribute(k, attrs[k]);
+  }
+  for (i = 2; i < arguments.length; i++){
+    var c = arguments[i];
+    if (c == null) continue;
+    e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c);
+  }
+  return e;
+}
+function pad(n){ return (n < 10 ? '0' : '') + n; }
+function uhr(d){ d = new Date(d); return pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds()); }
+function sleep(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+function loadScript(src){
+  return new Promise(function(res, rej){
+    var s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = function(){ rej(new Error('Skript fehlt: ' + src)); };
+    document.head.appendChild(s);
+  });
+}
+var ROM = {1:'I', 2:'II', 3:'III'};
+function punkte(n){ return n + (n === 1 ? ' Punkt' : ' Punkte'); }
+
+/* ---------- Zustand ---------- */
+var S = {
+  code: null, gruppe: null, inhalt: null, answers: {}, wahl: null, events: [],
+  deadline: 0, offset: 0, submitted: false, submitting: false, receipt: null, submittedAt: null,
+  hidden: false, blur: false, open: null, timer: null, hb: null, flushT: null, flushing: false, online: true, wake: null
+};
+var API = null;
+
+/* ---------- Server-Schnittstelle ---------- */
+function makeSupabaseApi(){
+  return {
+    call: function(fn, args){
+      var url = String(CFG.SUPABASE_URL || '').replace(/\/+$/, '') + '/rest/v1/rpc/' + fn;
+      return fetch(url, {
+        method: 'POST', keepalive: true,
+        headers: {'Content-Type': 'application/json', 'apikey': CFG.SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + CFG.SUPABASE_ANON_KEY},
+        body: JSON.stringify(args)
+      }).then(function(r){
+        return r.text().then(function(t){
+          var j = null; try { j = JSON.parse(t); } catch(e){}
+          if (!r.ok){ var err = new Error((j && j.message) || ('Serverfehler ' + r.status)); err.server = true; throw err; }
+          return j;
+        });
+      }, function(){ var err = new Error('Keine Verbindung zum Server'); err.offline = true; throw err; });
+    }
+  };
+}
+
+/* ---------- Lokale Sicherung ---------- */
+function persist(){
+  try {
+    localStorage.setItem(LS, JSON.stringify({code: S.code, gruppe: S.gruppe, inhalt: S.submitted ? null : S.inhalt, deadline: S.deadline, answers: S.answers, wahl: S.wahl, events: S.events,
+      submitted: S.submitted, receipt: S.receipt, submittedAt: S.submittedAt, t: Date.now()}));
+  } catch(e){}
+}
+function lokal(){ try { return JSON.parse(localStorage.getItem(LS) || 'null'); } catch(e){ return null; } }
+
+/* ---------- Serverzeit ---------- */
+function jetzt(){ return Date.now() + S.offset; }
+function syncZeit(serverNowMs, t0){
+  var t1 = Date.now();
+  if (typeof serverNowMs === 'number') S.offset = serverNowMs - Math.round((t0 + t1) / 2);
+}
+
+/* ---------- Anmeldung ---------- */
+function zeigeAnmeldung(meldung){
+  var app = $('#app'); app.innerHTML = '';
+  $('#leiste').hidden = true; $('#fuss').hidden = true;
+  var inp = h('input', {type: 'text', id: 'codefeld', maxlength: '9', autocomplete: 'off', autocapitalize: 'characters', autocorrect: 'off', spellcheck: 'false', placeholder: 'XXXX-XXXX', 'aria-label': 'Zugangscode'});
+  var btn = h('button', {class: 'btn', text: 'Arbeit starten', onclick: function(){ starte(inp.value, btn, fehl); }});
+  var fehl = h('div', {class: 'box fehler', hidden: ''});
+  if (meldung){ fehl.textContent = meldung; fehl.hidden = false; }
+  inp.addEventListener('input', function(){
+    var v = inp.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8);
+    inp.value = v.length > 4 ? v.slice(0, 4) + '-' + v.slice(4) : v;
+  });
+  inp.addEventListener('keydown', function(e){ if (e.key === 'Enter') btn.click(); });
+  app.appendChild(h('h1', {text: (CFG.TITEL || 'Physikarbeit') + ': Elektrische Stromstärke und Spannung'}));
+  app.appendChild(h('p', {class: 'klein', text: 'Klasse ' + CFG.KLASSE + ' · ' + CFG.DATUM + ' · Bearbeitungszeit ' + CFG.DAUER_MIN + ' Minuten'}));
+  app.appendChild(h('div', {class: 'box'},
+    h('p', {}, h('b', {text: 'Bitte vorher lesen'})),
+    h('p', {text: '• Gib den Zugangscode ein, den du von deiner Lehrkraft bekommen hast. Die Zeit läuft ab dem Start.'}),
+    h('p', {text: '• Bleibe während der Arbeit auf dieser Seite. Wenn du den Tab oder die App wechselst, wird das mit Datum, Uhrzeit und Dauer festgehalten und deiner Lehrkraft angezeigt.'}),
+    h('p', {text: '• Mit „Speichern und abgeben“ beendest du die Arbeit. Danach kann nichts mehr geändert werden.'}),
+    h('p', {text: '• Nicht im privaten Modus öffnen. Den Bildschirm nicht sperren.'})));
+  app.appendChild(h('p', {}, h('b', {text: 'Zugangscode'})));
+  app.appendChild(inp); app.appendChild(fehl); app.appendChild(btn);
+  setTimeout(function(){ try { inp.focus(); } catch(e){} }, 50);
+}
+
+function starte(codeRoh, btn, fehl){
+  var code = String(codeRoh || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (code.length !== 8){ if (fehl){ fehl.textContent = 'Der Code hat 8 Zeichen (z. B. K7M4-Q2XP).'; fehl.hidden = false; } return Promise.resolve(); }
+  code = code.slice(0, 4) + '-' + code.slice(4);
+  if (btn){ btn.disabled = true; btn.textContent = 'Einen Moment …'; }
+  var t0 = Date.now();
+  return API.call('exam_start', {p_code: code}).then(function(r){
+    syncZeit(r.server_now_ms, t0);
+    var l = lokal(); if (l && l.code !== code) l = null;
+    S.code = code; S.gruppe = r.gruppe;
+    S.answers = {}; S.wahl = null; S.events = [];
+    if (r.submitted){
+      S.submitted = true; S.receipt = r.quittung; S.submittedAt = r.submitted_at;
+      persist(); zeigeFertig(); return;
+    }
+    S.inhalt = r.inhalt; S.deadline = r.deadline_ms;
+    var sa = r.answers || {}, la = (l && l.answers) || {}, k;
+    for (k in sa) S.answers[k] = sa[k];
+    for (k in la) S.answers[k] = la[k];
+    S.wahl = (l && l.wahl != null) ? l.wahl : (r.wahl != null ? r.wahl : null);
+    var se = r.events || [], le = (l && l.events) || [];
+    S.events = le.length >= se.length ? le : se;
+    S.open = null;
+    for (var i = 0; i < S.events.length; i++) if (!S.events[i].bis) { S.events[i].bis = new Date().toISOString(); S.events[i].dauer = Math.round((Date.now() - new Date(S.events[i].von)) / 1000); S.events[i].art += ' (Seite neu geladen)'; }
+    persist();
+    zeigePruefung();
+  }).catch(function(e){
+    var l = lokal();
+    if (e.offline && l && l.code === code && l.inhalt && !l.submitted){
+      // Offline weiterarbeiten: Inhalt und Antworten stammen aus der lokalen Sicherung
+      S.code = code; S.gruppe = l.gruppe; S.inhalt = l.inhalt; S.deadline = l.deadline;
+      S.answers = l.answers || {}; S.wahl = l.wahl != null ? l.wahl : null; S.events = l.events || []; S.open = null;
+      zeigePruefung(); setOnline(false);
+      return;
+    }
+    if (!e.offline){ try { localStorage.removeItem(LS); } catch(x){} }
+    zeigeAnmeldung(e.offline ? 'Keine Verbindung zum Server. Prüfe das WLAN und versuche es noch einmal.' : e.message);
+  });
+}
+
+/* ---------- Prüfung anzeigen ---------- */
+function afbPunkte(a){ return a.punkte; }
+function pflichtAufgaben(){ return S.inhalt.aufgaben.filter(function(a){ return !a.wahl; }); }
+function wahlAufgaben(){ return S.inhalt.aufgaben.filter(function(a){ return a.wahl; }); }
+
+function optionen(a, aktiv){
+  var wrap = h('div', {class: 'optionen'});
+  a.optionen.forEach(function(t, i){
+    var L = 'ABCDE'.charAt(i);
+    var b = h('button', {class: 'opt' + (S.answers[a.n] === L ? ' sel' : ''), 'data-n': String(a.n), 'data-l': L, 'aria-pressed': S.answers[a.n] === L ? 'true' : 'false',
+      onclick: function(){ waehle(a.n, L); }},
+      h('span', {class: 'bu', text: L}), h('span', {text: t}));
+    wrap.appendChild(b);
+  });
+  return wrap;
+}
+
+function karte(a){
+  var istWahl = !!a.wahl;
+  var gewaehlt = S.wahl === a.n;
+  var card = h('section', {class: 'card afb' + a.afb + (istWahl && S.wahl != null && !gewaehlt ? ' aus' : ''), id: 'aufg' + a.n});
+  card.appendChild(h('div', {class: 'bar'},
+    h('span', {text: 'Aufgabe ' + a.n + '   AFB ' + ROM[a.afb] + ' ' + new Array(a.afb + 1).join('●')}),
+    h('span', {class: 're', text: (istWahl ? 'Wahlaufgabe · ' : '') + punkte(a.punkte) + ' · ca. ' + a.min + ' min'})));
+  var body = h('div', {class: 'body'});
+  body.appendChild(h('p', {class: 'frage', text: a.frage}));
+  if (a.bild) body.appendChild(h('img', {class: 'bild', src: a.bild, alt: 'Abbildung zu Aufgabe ' + a.n, draggable: 'false', style: 'width:100%;max-width:' + (a.bild_px || 520) + 'px'}));
+  if (!istWahl || gewaehlt){
+    body.appendChild(optionen(a));
+    if (istWahl) body.appendChild(h('button', {class: 'btn zweit klein', text: 'Wahl ändern', onclick: function(){ wahlAendern(); }}));
+  } else {
+    body.appendChild(h('button', {class: 'btn', text: S.wahl == null ? 'Diese Aufgabe wählen' : 'Stattdessen diese Aufgabe wählen', onclick: function(){ waehleAufgabe(a.n); }}));
+  }
+  card.appendChild(body);
+  return card;
+}
+
+function zeigePruefung(){
+  var app = $('#app'); app.innerHTML = '';
+  $('#kopf-fach').textContent = 'Physik – Klasse ' + CFG.KLASSE;
+  $('#kopf-ort').textContent = CFG.KOPF_ORT || '';
+  $('#codeanzeige').textContent = 'Code ' + S.code + ' · Gruppe ' + S.gruppe;
+  $('#leiste').hidden = false; $('#fuss').hidden = false;
+  app.appendChild(h('h1', {text: S.inhalt.titel}));
+  app.appendChild(h('p', {class: 'klein', text: 'Gruppe ' + S.gruppe + ' · ' + CFG.DATUM + ' · ' + CFG.DAUER_MIN + ' Minuten'}));
+  app.appendChild(h('div', {class: 'box'}, h('p', {text: S.inhalt.hinweis})));
+  var wahlGesetzt = false;
+  S.inhalt.aufgaben.forEach(function(a){
+    if (a.wahl && !wahlGesetzt){
+      wahlGesetzt = true;
+      app.appendChild(h('div', {class: 'wahlkopf'}, h('p', {}, h('b', {text: 'Wahlteil (AFB III): '}), 'Entscheide dich für ', h('b', {text: 'eine'}), ' der Aufgaben ' + wahlAufgaben().map(function(x){ return x.n; }).join(', ') + ' und bearbeite nur diese. Es zählt genau eine Aufgabe.')));
+    }
+    app.appendChild(karte(a));
+  });
+  app.appendChild(h('div', {class: 'box'}, h('p', {text: 'Wenn du fertig bist, tippe unten auf „Speichern und abgeben“. Du siehst vorher, welche Aufgaben noch offen sind.'})));
+  aktualisiereFortschritt();
+  starteSteuerung();
+}
+
+function neuZeichnen(n){
+  var alt = $('#aufg' + n); if (!alt) return;
+  alt.parentNode.replaceChild(karte(S.inhalt.aufgaben.filter(function(a){ return a.n === n; })[0]), alt);
+}
+
+/* ---------- Antworten ---------- */
+function waehle(n, L){
+  if (S.submitted || S.submitting) return;
+  if (S.answers[n] === L) S.answers[n] = null; else S.answers[n] = L;
+  var btns = document.querySelectorAll('#aufg' + n + ' .opt');
+  for (var i = 0; i < btns.length; i++){
+    var on = btns[i].getAttribute('data-l') === S.answers[n];
+    btns[i].classList.toggle('sel', on); btns[i].setAttribute('aria-pressed', on ? 'true' : 'false');
+  }
+  persist(); aktualisiereFortschritt(); planeSpeichern();
+}
+function waehleAufgabe(n){
+  if (S.submitted || S.submitting) return;
+  var alt = S.wahl;
+  var weiter = function(){
+    if (alt != null) S.answers[alt] = null;
+    S.wahl = n;
+    wahlAufgaben().forEach(function(a){ neuZeichnen(a.n); });
+    persist(); aktualisiereFortschritt(); planeSpeichern();
+  };
+  if (alt != null && alt !== n && S.answers[alt]) frage('Aufgabe wechseln?', 'Deine Antwort zu Aufgabe ' + alt + ' wird dabei gelöscht.', 'Ja, wechseln', 'Abbrechen').then(function(ok){ if (ok) weiter(); });
+  else weiter();
+}
+function wahlAendern(){
+  if (S.submitted || S.submitting) return;
+  var alt = S.wahl;
+  var weiter = function(){
+    if (alt != null) S.answers[alt] = null;
+    S.wahl = null;
+    wahlAufgaben().forEach(function(a){ neuZeichnen(a.n); });
+    persist(); aktualisiereFortschritt(); planeSpeichern();
+  };
+  if (alt != null && S.answers[alt]) frage('Wahl ändern?', 'Deine Antwort zu Aufgabe ' + alt + ' wird dabei gelöscht.', 'Ja, Wahl ändern', 'Abbrechen').then(function(ok){ if (ok) weiter(); });
+  else weiter();
+}
+function offene(){
+  var o = [];
+  pflichtAufgaben().forEach(function(a){ if (!S.answers[a.n]) o.push(a.n); });
+  if (S.wahl == null) o.push('Wahlaufgabe (13–15) nicht gewählt'); else if (!S.answers[S.wahl]) o.push(S.wahl);
+  return o;
+}
+function aktualisiereFortschritt(){
+  var gesamt = pflichtAufgaben().length + 1;
+  var fertig = gesamt - offene().length;
+  $('#fortschritt').textContent = 'Beantwortet: ' + fertig + ' von ' + gesamt;
+}
+
+/* ---------- Dialog ---------- */
+function frage(titel, text, ja, nein, extra){
+  return new Promise(function(res){
+    var dlg = $('#dlg'); dlg.innerHTML = '';
+    dlg.appendChild(h('h2', {text: titel}));
+    dlg.appendChild(h('p', {text: text}));
+    if (extra) dlg.appendChild(extra);
+    var z = h('div', {class: 'zeile'},
+      h('button', {class: 'btn zweit', text: nein, onclick: function(){ zu(false); }}),
+      h('button', {class: 'btn', text: ja, onclick: function(){ zu(true); }}));
+    dlg.appendChild(z);
+    $('#modal').classList.add('an');
+    function zu(v){ $('#modal').classList.remove('an'); res(v); }
+  });
+}
+
+/* ---------- Speichern auf dem Server (laufend) ---------- */
+function nutzlast(){ return {p_code: S.code, p_answers: S.answers, p_wahl: S.wahl, p_events: S.events}; }
+function planeSpeichern(){
+  if (S.flushT) clearTimeout(S.flushT);
+  S.flushT = setTimeout(function(){ S.flushT = null; speichere(); }, 700);
+}
+function setOnline(ok){
+  S.online = ok;
+  var s = $('#status'); if (s) s.className = 'punkt' + (ok ? '' : ' off');
+}
+function speichere(){
+  if (S.submitted || S.submitting || !S.code) return Promise.resolve();
+  var t0 = Date.now();
+  return API.call('exam_save', nutzlast()).then(function(r){
+    setOnline(true);
+    syncZeit(r.server_now_ms, t0);
+    if (r.deadline_ms) S.deadline = r.deadline_ms;
+    if (r.gesperrt){ S.submitted = true; persist(); zeigeFertig(); }
+  }).catch(function(e){ setOnline(false); });
+}
+
+/* ---------- Tab- und Fokus-Protokoll ---------- */
+function weg(){ return S.hidden || S.blur; }
+function ursache(){ return S.hidden ? 'Tab/App verlassen' : 'Fenster ohne Fokus (z. B. Split View, Mitteilung)'; }
+function wechsel(){
+  if (S.submitted || !S.code) return;
+  var jetztD = new Date();
+  if (weg() && !S.open){
+    S.open = {von: jetztD.toISOString(), bis: null, dauer: null, art: ursache()};
+    S.events.push(S.open);
+    persist(); speichere();
+  } else if (weg() && S.open){
+    if (S.hidden) S.open.art = 'Tab/App verlassen';
+    persist();
+  } else if (!weg() && S.open){
+    S.open.bis = jetztD.toISOString();
+    S.open.dauer = Math.round((jetztD - new Date(S.open.von)) / 1000);
+    S.open = null; persist(); speichere();
+  }
+  anzeigeVerlassen();
+}
+function anzeigeVerlassen(){
+  var n = S.events.length;
+  $('#verlassen').textContent = n ? ('Seite verlassen: ' + n + '×') : '';
+}
+function wakeLock(){
+  try { if (navigator.wakeLock && !document.hidden) navigator.wakeLock.request('screen').then(function(w){ S.wake = w; }, function(){}); } catch(e){}
+}
+
+function starteSteuerung(){
+  if (S.timer) return;
+  anzeigeVerlassen();
+  document.addEventListener('visibilitychange', function(){ S.hidden = document.hidden; if (!document.hidden) wakeLock(); wechsel(); });
+  window.addEventListener('blur', function(){ S.blur = true; wechsel(); });
+  window.addEventListener('focus', function(){ S.blur = false; wechsel(); });
+  window.addEventListener('pagehide', function(){ S.hidden = true; wechsel(); });
+  window.addEventListener('pageshow', function(){ S.hidden = document.hidden; S.blur = false; wechsel(); });
+  window.addEventListener('online', function(){ speichere(); });
+  S.hidden = document.hidden;
+  wakeLock();
+  tick();
+  S.timer = setInterval(tick, 500);
+  S.hb = setInterval(function(){ if (!document.hidden) speichere(); }, 10000);
+  speichere();
+  $('#abgabe').addEventListener('click', abgabeDialog);
+}
+
+function tick(){
+  if (S.submitted){ return; }
+  var rest = Math.max(0, Math.round((S.deadline - jetzt()) / 1000));
+  var z = $('#zeit');
+  z.textContent = pad(Math.floor(rest / 60)) + ':' + pad(rest % 60);
+  z.className = rest <= 300 ? 'sehr' : (rest <= 600 ? 'knapp' : '');
+  if (rest <= 0 && !S.submitting){ abgabe('Die Zeit ist abgelaufen. Deine Arbeit wird automatisch gespeichert.'); }
+}
+
+/* ---------- Abgabe ---------- */
+function abgabeDialog(){
+  if (S.submitted || S.submitting) return;
+  var o = offene();
+  var extra = h('div', {});
+  if (o.length) extra.appendChild(h('div', {class: 'box warn'}, h('b', {text: 'Noch nicht beantwortet: '}), o.join(', ')));
+  var notfall = h('button', {class: 'btn zweit klein', text: 'Notfall-Sicherung als Datei', onclick: sicherungDatei});
+  frage('Arbeit speichern und abgeben?', 'Danach kann nichts mehr verändert werden.', 'Ja, speichern', 'Zurück', extra).then(function(ok){ if (ok) abgabe(); });
+}
+function abgabe(hinweis){
+  if (S.submitting || S.submitted) return;
+  S.submitting = true;
+  var app = $('#app');
+  var overlay = h('div', {class: 'box', id: 'ueberlay'}, h('p', {}, h('b', {text: hinweis || 'Wird gespeichert …'})));
+  app.insertBefore(overlay, app.firstChild);
+  window.scrollTo(0, 0);
+  if (S.flushT){ clearTimeout(S.flushT); S.flushT = null; }
+  var t0 = Date.now();
+  API.call('exam_submit', nutzlast()).then(function(r){
+    syncZeit(r.server_now_ms, t0);
+    S.submitted = true; S.submitting = false; S.receipt = r.quittung; S.submittedAt = r.submitted_at;
+    persist(); zeigeFertig();
+  }).catch(function(e){
+    S.submitting = false;
+    var u = $('#ueberlay'); if (u) u.parentNode.removeChild(u);
+    var box = h('div', {class: 'box fehler', id: 'ueberlay'}, h('p', {}, h('b', {text: 'Nicht gespeichert. '}), e.offline ? 'Keine Verbindung zum Server. Prüfe das WLAN und tippe erneut auf „Speichern und abgeben“. Deine Antworten sind auf dem Gerät gesichert.' : e.message),
+      h('button', {class: 'btn zweit klein', text: 'Notfall-Sicherung als Datei', onclick: sicherungDatei}),
+      h('button', {class: 'btn klein', text: 'Erneut versuchen', onclick: function(){ abgabe(); }}));
+    app.insertBefore(box, app.firstChild);
+    window.scrollTo(0, 0);
+  });
+}
+function sicherungDatei(){
+  var daten = {code: S.code, gruppe: S.gruppe, answers: S.answers, wahl: S.wahl, events: S.events, quittung: S.receipt, gespeichert: new Date().toISOString()};
+  var blob = new Blob([JSON.stringify(daten, null, 1)], {type: 'application/json'});
+  var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'sicherung_' + (S.code || 'arbeit') + '.json';
+  document.body.appendChild(a); a.click(); setTimeout(function(){ document.body.removeChild(a); }, 500);
+}
+
+function zeigeFertig(){
+  if (S.timer){ clearInterval(S.timer); S.timer = null; }
+  if (S.hb){ clearInterval(S.hb); S.hb = null; }
+  try { if (S.wake) S.wake.release(); } catch(e){}
+  $('#leiste').hidden = true; $('#fuss').hidden = true;
+  var app = $('#app'); app.innerHTML = '';
+  app.appendChild(h('h1', {text: 'Deine Arbeit ist gespeichert'}));
+  app.appendChild(h('div', {class: 'box ok'},
+    h('p', {text: 'Sie kann nicht mehr verändert werden. Zeige diesen Bildschirm deiner Lehrkraft.'}),
+    h('p', {class: 'klein', text: 'Prüfcode'}),
+    h('div', {class: 'fertig', id: 'quittung', text: S.receipt || '—'}),
+    h('p', {class: 'klein', text: 'Code ' + (S.code || '') + (S.submittedAt ? ' · gespeichert um ' + uhr(S.submittedAt) + ' Uhr' : '')})));
+  app.appendChild(h('button', {class: 'btn zweit', text: 'Sicherungsdatei speichern (optional)', onclick: sicherungDatei}));
+  app.appendChild(h('p', {class: 'klein', text: 'Du kannst diese Seite jetzt schließen. Bitte bleibe ruhig und störe die anderen nicht.'}));
+  if (CFG.MODUS === 'demo' && window.DemoApi && window.DemoApi.exportiere){
+    app.appendChild(h('button', {class: 'btn zweit klein', id: 'demoexport', text: 'Demo: Export (JSON) anzeigen', onclick: function(){ var p = h('pre', {id: 'demoexportinhalt', style: 'white-space:pre-wrap;font-size:12px;-webkit-user-select:text;user-select:text'}); p.textContent = JSON.stringify(window.DemoApi.exportiere(), null, 1); app.appendChild(p); }}));
+  }
+}
+
+/* ---------- Start ---------- */
+function init(){
+  document.title = (CFG.TITEL || 'Physikarbeit') + ' – Klasse ' + CFG.KLASSE;
+  $('#kopf-fach').textContent = 'Physik – Klasse ' + CFG.KLASSE;
+  $('#kopf-ort').textContent = CFG.KOPF_ORT || '';
+  document.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+  var prom = CFG.MODUS === 'demo' ? loadScript('demo.js').then(function(){ API = window.DemoApi; }) : Promise.resolve().then(function(){ API = makeSupabaseApi(); });
+  prom.then(function(){
+    var l = lokal();
+    if (l && l.code && !l.submitted) starte(l.code, null, null);
+    else if (l && l.code && l.submitted){ S.code = l.code; S.submitted = true; S.receipt = l.receipt; S.submittedAt = l.submittedAt; zeigeFertig(); }
+    else zeigeAnmeldung();
+  }).catch(function(e){ $('#app').appendChild(h('div', {class: 'box fehler', text: String(e.message || e)})); });
+}
+init();
+window.__S = S;  // nur zu Testzwecken lesbar
+})();
+</script>
+</body>
+</html>
